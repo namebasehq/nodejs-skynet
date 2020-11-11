@@ -17,11 +17,15 @@ const defaultUploadOptions = {
 };
 
 SkynetClient.prototype.uploadFile = function (path, customOptions = {}) {
+  return this.uploadData(fs.createReadStream(path), customOptions);
+};
+
+SkynetClient.prototype.uploadData = function (data, customOptions = {}) {
   const opts = { ...defaultUploadOptions, ...this.customOptions, ...customOptions };
 
   const formData = new FormData();
   const filename = opts.customFilename ? opts.customFilename : "";
-  formData.append(opts.portalFileFieldname, fs.createReadStream(path), filename);
+  formData.append(opts.portalFileFieldname, data, filename);
 
   const params = {};
   if (opts.dryRun) params.dryrun = true;

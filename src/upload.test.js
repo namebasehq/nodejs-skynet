@@ -122,6 +122,34 @@ describe("uploadFile", () => {
   });
 });
 
+describe("uploadData", () => {
+  const filename = "testdata/file1.txt";
+  const content = Buffer.from("<html><body>file1</body></html>", "utf-8");
+
+  beforeEach(() => {
+    axios.mockResolvedValue({ data: { skylink } });
+  });
+
+  it("should send post request to default portal", () => {
+    client.uploadData(content, { customFilename: filename });
+
+    expect(axios).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: `${portalUrl}/skynet/skyfile`,
+        data: expect.objectContaining({
+          _streams: expect.arrayContaining([
+            expect.stringContaining(
+              'Content-Disposition: form-data; name="file"; filename="file1.txt"\r\nContent-Type: text/plain'
+            ),
+          ]),
+        }),
+        headers: expect.objectContaining({ "content-type": expect.stringContaining("multipart/form-data") }),
+        params: expect.anything(),
+      })
+    );
+  });
+});
+
 describe("uploadDirectory", () => {
   const dirname = "testdata";
   const directory = ["file1.txt", "file2.txt", "dir1/file3.txt"];
